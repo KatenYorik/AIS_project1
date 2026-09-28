@@ -4,18 +4,14 @@
 Автор — Ходарева Екатерина.
 
 Собственная архивная съёмка птиц у кормушки размечена по кадрам. На ней дообучен
-классификатор YOLO (Проект 1), а в Проекте 2 он в формате ONNX управляет роботом через
-ROS 2: turtlesim и TurtleBot3 в Gazebo.
+классификатор YOLO.
 
 ## Ссылки
 
 | что | где |
 |---|---|
-| Отчёт Проекта 1 | [`project1/ОТЧЁТ_ПРОЕКТ1.ru.md`](../project1/ОТЧЁТ_ПРОЕКТ1.ru.md) |
-| Отчёт Проекта 2 | [`project2/ОТЧЁТ_ПРОЕКТ2.ru.md`](../project2/ОТЧЁТ_ПРОЕКТ2.ru.md) |
-| ClearML, проект `AIS-birds` | `<ССЫЛКА ВПИСАТЬ>` |
-| Видео: Gazebo | `<ССЫЛКА ВПИСАТЬ>` |
-| Видео: turtlesim | `<ССЫЛКА ВПИСАТЬ>` |
+| Отчёт Проекта 1 | [`project1/ОТЧЁТ_ПРОЕКТ1.ru.md`](ОТЧЁТ_ПРОЕКТ1.ru.md) |
+| ClearML, проект `AIS-birds` | `https://app.clear.ml/projects/c2fb292e6f5d4d98a248152756f16684/experiments/87432635605b4483a312f63b277e30e1/output/execution` |
 | Итоговая модель ONNX | [`data/runs/classify/pretrain_stage2/weights/best.onnx`](../data/runs/classify/pretrain_stage2/weights/best.onnx) |
 
 ## Главное
@@ -28,10 +24,6 @@ ROS 2: turtlesim и TurtleBot3 в Gazebo.
 Главный результат — измеренная цена неправильного деления: та же модель на тех же кадрах
 даёт 0.833 при делении по кадрам и 0.402 по клипам. Утечка идёт через узнавание сцены.
 
-**Проект 2.** Цепочка `camera_publisher → classifier_node (onnxruntime) → controller_node →
-/cmd_vel`, панель Gradio. Контроллер выбирает действие — подъехать, стоять, отъехать —
-минимизацией ожидаемой свободной энергии, с порогом уверенности. ONNX совпадает с PyTorch
-до 2·10⁻⁶. Демонстрация — все три действия в turtlesim и в Gazebo Sim 8 с TurtleBot3.
 
 ## Устройство репозитория
 
@@ -41,10 +33,6 @@ ROS 2: turtlesim и TurtleBot3 в Gazebo.
 ```
 project1/                  Проект 1 — классификатор
   step1_task … step8_deployment_demo
-project2/                  Проект 2 — ROS 2, ONNX, Gradio, Gazebo
-  ros2_ws/src/birdcls/     пакет ROS 2
-  step1_task_design … step8_demo
-scientific_question/       научная часть поверх той же разметки
 common/aispaths.py         где лежат данные; все скрипты работают через него
 data/                      разметка, метрики, журналы демо, итоговый ONNX
 ```
@@ -55,16 +43,11 @@ data/                      разметка, метрики, журналы де
 ## Запуск
 
 Python 3.11, ultralytics, onnxruntime, gradio, clearml (`common/setup_windows.ps1`).
-Для Проекта 2 — WSL, Ubuntu 24.04, ROS 2 Jazzy (`common/УСТАНОВКА.ru.md`).
 
 ```powershell
 python project1/step5_metrics/svodka.py                  # метрики всех 13 запусков
 python project1/step2_dataset/split_help.py --check      # тесты деления по клипам
 ```
 
-```bash
-bash project2/step8_demo/demo_gazebo.sh                  # Gazebo + цепочка + панель
-bash project2/step8_demo/demo_turtle.sh                  # то же в turtlesim
-```
 
 Пути в аргументах скриптов считаются от `data/` (см. `common/README.md`).
