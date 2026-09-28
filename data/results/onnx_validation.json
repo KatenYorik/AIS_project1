@@ -1,0 +1,16 @@
+{
+ "onnx": "runs\\classify\\pretrain_stage2\\weights\\best.onnx",
+ "max_prob_diff": 2.1457672119140625e-06,
+ "class_changes": 0,
+ "n_images": 60,
+ "latency_ms_onnx_median": 6.047400000170455,
+ "latency_ms_onnx_p95": 7.024900000033085,
+ "latency_ms_torch_median": 18.599700000777375,
+ "fps_onnx": 165.36032013291884,
+ "valid": true,
+ "classes": {
+  "0": "alert",
+  "1": "empty",
+  "2": "feeding"
+ }
+}

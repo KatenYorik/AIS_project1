@@ -1,0 +1,23 @@
+clip,start_s,end_s,label,note
+snegir2692,0.00,2.25,head_down,
+snegir2692,2.25,3.75,head_up,короткий осмотр
+snegir2692,3.75,16.75,head_down,длинная кормовая серия
+snegir2692,16.75,18.75,head_up,
+snegir2692,18.75,26.50,head_down,
+snegir2692,26.50,27.50,ambiguous,птица у края кадра
+snegir2692,27.50,34.75,head_down,
+snegir2692,34.75,35.75,head_up,короткий осмотр
+snegir2692,35.75,39.50,head_down,
+snegir2692,39.50,42.75,ambiguous,ветка поперёк головы
+snegir2692,42.75,46.75,head_up,
+snegir2692,46.75,47.25,head_down,
+snegir2692,47.25,48.25,ambiguous,смазано
+snegir2692,48.25,49.25,head_up,
+snegir2692,49.25,51.25,head_down,
+snegir2692,51.25,55.75,head_up,
+snegir2692,55.75,56.25,ambiguous,головы не видно
+snegir2692,56.25,63.25,head_up,длинная серия осмотра
+snegir2692,63.25,63.75,head_down,
+snegir2692,63.75,68.75,ambiguous,видна только спина
+snegir2692,68.75,71.75,head_up,
+snegir2692,71.75,81.50,ambiguous,птица за ветками, не видна

@@ -1,0 +1,34 @@
+{
+ "accuracy": 0.3382352941176471,
+ "macro_f1": 0.29878975513650435,
+ "weighted_f1": 0.27994679999779254,
+ "labels": [
+  "alert",
+  "empty",
+  "feeding"
+ ],
+ "confusion": [
+  [
+   50,
+   1,
+   10
+  ],
+  [
+   17,
+   6,
+   63
+  ],
+  [
+   42,
+   2,
+   13
+  ]
+ ],
+ "experiment": "aug",
+ "note": "аугментация выкл / обычная / сильная на почти-дубликатах",
+ "fliplr": 0.0,
+ "baseline_class": "alert",
+ "baseline_accuracy": 0.29901960784313725,
+ "strongest_constant_class": "empty",
+ "strongest_constant_accuracy": 0.4215686274509804
+}

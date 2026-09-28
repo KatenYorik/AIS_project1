@@ -1,0 +1,97 @@
+{
+ "accuracy": 0.2549019607843137,
+ "macro_f1": 0.10311599872746187,
+ "weighted_f1": 0.17149347723062122,
+ "labels": [
+  "handling",
+  "head_down",
+  "head_up_ahead",
+  "head_up_turnL",
+  "head_up_turnR",
+  "no_bird"
+ ],
+ "confusion": [
+  [
+   0,
+   0,
+   17,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   1,
+   39,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   41,
+   0,
+   0,
+   1
+  ],
+  [
+   0,
+   0,
+   11,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   7,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   14,
+   61,
+   0,
+   1,
+   10
+  ]
+ ],
+ "experiment": "base",
+ "note": "своя съёмка, 8 мелких классов",
+ "fliplr": 0.0,
+ "baseline_class": "head_up_ahead",
+ "baseline_accuracy": 0.20588235294117646,
+ "strongest_constant_class": "no_bird",
+ "strongest_constant_accuracy": 0.4215686274509804,
+ "course3_view": {
+  "accuracy": 0.3480392156862745,
+  "macro_f1": 0.24535179833243068,
+  "weighted_f1": 0.2448181723479482,
+  "labels": [
+   "alert",
+   "empty",
+   "feeding"
+  ],
+  "confusion": [
+   [
+    60,
+    1,
+    0
+   ],
+   [
+    62,
+    10,
+    14
+   ],
+   [
+    56,
+    0,
+    1
+   ]
+  ]
+ }
+}

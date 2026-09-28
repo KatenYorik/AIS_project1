@@ -1,0 +1,34 @@
+{
+ "accuracy": 0.5636363636363636,
+ "macro_f1": 0.4877410350273632,
+ "weighted_f1": 0.483528054946804,
+ "labels": [
+  "alert",
+  "empty",
+  "feeding"
+ ],
+ "confusion": [
+  [
+   115,
+   9,
+   8
+  ],
+  [
+   3,
+   33,
+   8
+  ],
+  [
+   75,
+   17,
+   7
+  ]
+ ],
+ "experiment": "frozen",
+ "note": "замороженный backbone против полного дообучения",
+ "fliplr": 0.0,
+ "baseline_class": "alert",
+ "baseline_accuracy": 0.48,
+ "strongest_constant_class": "alert",
+ "strongest_constant_accuracy": 0.48
+}

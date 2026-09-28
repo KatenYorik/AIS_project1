@@ -1,0 +1,39 @@
+# Репозиторий AIS 2026: код и документы Проектов 1 и 2 и научной части.
+# Данные версионируются в ClearML, а не в git (лекция 5). Здесь — только то, что
+# весит мало и нужно, чтобы понять и повторить работу.
+
+# ---------------------------------------------------------------- данные
+# Из data/ берём описание, разметку, метрики, журналы демо и итоговую модель ONNX.
+/data/*
+!/data/README.md
+!/data/labels_all.csv
+!/data/labels_mine.csv
+!/data/labels_storona.csv
+!/data/intervals_snegir2692.csv
+!/data/scenes_groups.csv
+!/data/B_data.json
+!/data/results/
+!/data/runs/
+/data/runs/*
+!/data/runs/classify/
+/data/runs/classify/*
+!/data/runs/classify/pretrain_stage2/
+/data/runs/classify/pretrain_stage2/*
+!/data/runs/classify/pretrain_stage2/weights/
+/data/runs/classify/pretrain_stage2/weights/*
+!/data/runs/classify/pretrain_stage2/weights/best.onnx
+# kluch.csv — ключ слепой повторной разметки: не публиковать, пока она не сделана.
+
+# исходные видео и открытый датасет (десятки ГБ); код для СММ из wetlandbirds оставляем
+/птицы/
+/wetlandbirds/*
+!/wetlandbirds/hmm_phases.py
+
+# ---------------------------------------------------------------- служебное
+__pycache__/
+*.pyc
+*.pt
+*.mp4
+*.mov
+*.MOV
+log_*.txt

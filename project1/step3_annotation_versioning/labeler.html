@@ -1,0 +1,507 @@
+<meta charset="utf-8">
+<title>Разметка кадров</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --line:#252a34; --fg:#e6e9ef; --muted:#8b93a3;
+    --down:#c25e12; --up:#009486; --other:#6a7ce0; --amb:#8b93a3; --up2:#4fb3a3; --up3:#7fd0c4; --up4:#5d7f79; --hand:#b8860b; --nobird:#3a4050; --legacy:#c9a227;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:14px/1.5 "IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  header{padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);
+         display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.01em}
+  .sp{flex:1}
+  button,label.btn{background:#222733;color:var(--fg);border:1px solid var(--line);
+      border-radius:7px;padding:6px 12px;cursor:pointer;font-size:13px}
+  button:hover,label.btn:hover{background:#2b313f}
+  button:disabled{opacity:.4;cursor:default}
+  input[type=file]{display:none}
+  main{flex:1;display:flex;min-height:0}
+  #stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;
+         background:#0b0d11;min-width:0}
+  #stage img{max-width:100%;max-height:100%;object-fit:contain}
+  #empty{color:var(--muted);text-align:center;max-width:520px;padding:24px}
+  #empty h2{color:var(--fg);font-size:16px}
+  #empty ol{text-align:left}
+  aside{width:290px;background:var(--panel);border-left:1px solid var(--line);
+        padding:14px;overflow:auto;flex-shrink:0}
+  .k{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;
+     border:1px solid var(--line);margin-bottom:7px;cursor:pointer;background:#1b1f28}
+  .k:hover{background:#222733}
+  .k .key{width:22px;height:22px;border-radius:5px;background:#000;display:grid;
+          place-items:center;font-weight:600;font-size:12px;flex-shrink:0}
+  .k .sw{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+  .k.cur{outline:2px solid #fff;outline-offset:1px}
+  .cnt{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+  h3{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+     margin:18px 0 8px;font-weight:600}
+  #bar{height:4px;background:#000;display:flex}
+  #bar div{height:100%}
+  #meta{padding:8px 16px;background:var(--panel);border-top:1px solid var(--line);
+        display:flex;gap:18px;align-items:center;font-size:13px;flex-wrap:wrap}
+  #fname{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;color:var(--muted)}
+  .badge{padding:3px 10px;border-radius:999px;font-weight:600;font-size:12px;color:#0b0d11}
+  kbd{background:#000;border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+      font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+  ul.hint{padding-left:16px;margin:6px 0;color:var(--muted);font-size:12.5px}
+  ul.hint li{margin:3px 0}
+</style>
+
+<header>
+  <h1>Разметка кадров</h1>
+  <label class="btn">Открыть папку raw<input type="file" id="pick" webkitdirectory directory multiple accept="image/*"></label>
+  <label class="btn">Загрузить метки CSV<input type="file" id="pickcsv" accept=".csv"></label>
+  <div class="sp"></div>
+  <button id="expLab">Скачать метки</button>
+  <button id="expInt">Скачать интервалы</button>
+</header>
+
+<div id="bar"></div>
+
+<main>
+  <div id="stage">
+    <div id="empty">
+      <h2>Как начать</h2>
+      <ol>
+        <li>«Открыть папку raw» → <code>AIS\data\raw</code>. Это единственная папка,
+            которую надо открывать. Файлы никуда не отправляются — всё в браузере.</li>
+        <li>«Загрузить метки CSV» → <code>labels_new.csv</code>. Больше половины кадров
+            уже размечены, пересмотреть надо только осмотр.</li>
+        <li>Нажми <kbd>U</kbd> — прыжок на первый кадр, который ждёт пересмотра.</li>
+        <li>Размечай клавишами <kbd>1</kbd>…<kbd>8</kbd>. Кадр помечается и сразу
+            листается дальше.</li>
+      </ol>
+      <ul class="hint">
+        <li><kbd>1</kbd> клюёт · <kbd>2</kbd> держит корм · осмотр: <kbd>3</kbd> голова
+            по телу · <kbd>4</kbd> поворот влево · <kbd>5</kbd> вправо ·
+            <kbd>6</kbd> взлёт/посадка · <kbd>7</kbd> птицы нет · <kbd>8</kbd> непонятно</li>
+        <li><b>Поворот считается от оси тела, а не от камеры.</b> Сравни направление
+            корпуса и направление клюва — разница и есть поворот</li>
+        <li><b>Взгляд — отдельно от позы:</b> <kbd>F</kbd> смотрит на наблюдателя ·
+            <kbd>D</kbd> не смотрит · <kbd>S</kbd> глаз не разглядеть · <kbd>X</kbd> снять.
+            Птица может смотреть на тебя, не поворачивая головы, — глаз у воробьиных
+            подвижен на 22–36°</li>
+        <li><kbd>U</kbd> — следующий кадр со старой меткой, которую надо пересмотреть</li>
+        <li><kbd>←</kbd> <kbd>→</kbd> листать · <kbd>Backspace</kbd> снять метку</li>
+        <li><kbd>Shift</kbd> + цифра — поставить метку и <b>протянуть её вперёд</b> до
+            следующего размеченного кадра. Главный ускоритель: серия из двадцати кадров
+            размечается одним нажатием.</li>
+        <li><kbd>Home</kbd> — первый неразмеченный кадр</li>
+      </ul>
+    </div>
+  </div>
+
+  <aside>
+    <div id="keys"></div>
+    <h3>Прогресс</h3>
+    <div id="stats"></div>
+    <h3>Клипы</h3>
+    <div id="clips"></div>
+    <h3>Подсказка</h3>
+    <ul class="hint">
+      <li><b>ищет / клюёт</b> — клюв у корма или в корме, голова ниже линии спины</li>
+      <li><b>держит корм</b> — зерно в клюве или под лапой, голова при этом поднята.
+          Отдельный класс: птица не ищет корм, но и не чисто осматривается</li>
+      <li><b>осмотр</b> — голова поднята, корма в клюве нет. Дальше — куда повёрнута
+          голова <b>относительно тела</b>:</li>
+      <li>«по телу» — голова смотрит туда же, куда корпус; «влево» / «вправо» — голова
+          повёрнута от оси тела в эту сторону</li>
+      <li><b>Это не то же, что раньше.</b> Прошлый раз сторону считали от камеры, и она
+          определялась тем, как птица села. Поворот от тела — выбор самой птицы</li>
+      <li>«влево» и «вправо» — с точки зрения птицы: если она смотрит на тебя, её левая
+          сторона будет справа на экране</li>
+      <li><b>взлёт / посадка</b> — птица в воздухе, приземляется, перепрыгивает</li>
+      <li><b>птицы нет</b> — в кадре пусто</li>
+      <li><b>непонятно</b> — перекрыто, смазано, поза между, поворот не читается</li>
+      <li>сомневаешься дольше двух секунд — <kbd>8</kbd> и дальше</li>
+      <li><b>взгляд</b> ставится по видимым признакам: блик в глазу смещён к наблюдателю,
+          глаз виден целиком и не прикрыт, зрачок обращён к камере. Не по ощущению
+          «сосредоточенности» и не по памяти о том, что было в видео</li>
+    </ul>
+    <h3 style="margin-top:14px">Три прохода — <b>Tab</b> переключает</h3>
+    <p style="color:var(--muted);font-size:13px">Текущий режим написан в нижней строке.
+    В режимах 2 и 3 стрелки листают только нужные кадры, остальные пропускаются.</p>
+
+    <h4 style="margin:10px 0 4px">Режим 1 — классы</h4>
+    <ul>
+      <li><b>1</b> ищет / клюёт · <b>2</b> держит корм · <b>3</b> осмотр, голова по телу ·
+          <b>4</b> поворот влево · <b>5</b> поворот вправо · <b>6</b> взлёт / посадка ·
+          <b>7</b> птицы нет · <b>8</b> непонятно</li>
+      <li><b>Shift + цифра</b> — протянуть метку вперёд до следующего размеченного кадра</li>
+      <li><b>Backspace</b> — стереть класс, <b>Home</b> — первый неразмеченный,
+          <b>U</b> — следующая старая метка</li>
+    </ul>
+
+    <h4 style="margin:10px 0 4px">Режим 2 — взгляд и сторона (только кадры осмотра)</h4>
+    <ul>
+      <li><b>Q</b> левым боком к камере · <b>W</b> правым боком · <b>E</b> анфас, оба глаза ·
+          <b>R</b> затылком. Это про геометрию съёмки, а не про птицу.</li>
+      <li><b>F</b> смотрит на тебя · <b>D</b> не смотрит · <b>S</b> глаз не разглядеть.
+          После нажатия сразу следующий кадр осмотра.</li>
+      <li><b>C</b> — пометить «вернуться и проверить» (уходит в колонку note)</li>
+      <li><b>Z</b> стереть сторону · <b>X</b> стереть взгляд</li>
+    </ul>
+
+    <h4 style="margin:10px 0 4px">Режим 3 — число птиц в кадре</h4>
+    <ul>
+      <li><b>0…9</b> — сколько птиц видно в кадре ВСЕГО, включая ту, которую ведёшь.
+          После нажатия сразу следующий кадр.</li>
+      <li><b>Shift + цифра</b> — протянуть счёт вперёд по клипу: число меняется редко,
+          так что почти весь клип закрывается несколькими нажатиями</li>
+      <li><b>B</b> — стереть счёт</li>
+    </ul>
+    <p style="color:var(--muted);font-size:13px">Считается сцена, а не поведение: птица,
+    сидящая с краю и ничего не делающая, тоже считается. Если часть птиц за веткой и
+    сосчитать нельзя — ставь то, что видно, и жми <b>C</b>.</p>
+
+    <h3 style="margin-top:14px">Что во что уходит</h3>
+    <p style="color:var(--muted);font-size:13px">Выгрузка «Скачать метки» даёт пять колонок:
+    <code>label</code> (режим 1), <code>side</code> и <code>fixation</code> (режим 2),
+    <code>count</code> (режим 3) и <code>note</code>. Загружать можно несколько CSV подряд —
+    они дополняют друг друга, а не заменяют.</p>
+  </aside>
+</main>
+
+<div id="meta">
+  <span id="pos">—</span>
+  <span id="fname"></span>
+  <span id="cur"></span>
+  <span id="fix"></span>
+  <span id="side"></span>
+  <span id="mark"></span>
+  <span id="cnt"></span>
+  <span id="mode"></span>
+  <div class="sp"></div>
+  <span id="tip" style="color:var(--muted)">Tab — сменить режим · Shift+цифра — протянуть вперёд · Q/W/E/R сторона · F/D/S взгляд · C проверить · Z/X/B стереть</span>
+</div>
+
+<script>
+// Классы. Три принципа:
+//  1) размечаем МЕЛКО, анализируем КРУПНО — слить классы потом бесплатно, разделить нельзя;
+//  2) поворот головы считается ОТ ОСИ ТЕЛА, а не от камеры: положение тела задаётся
+//     веткой и стороной подлёта, а поворот головы — это выбор самой птицы;
+//  3) «птицы нет» и «взлёт/посадка» — разные вещи и для модели, и для границ визита.
+const CLASSES = [
+  {id:"head_down",      key:"1", name:"ищет / клюёт корм",      color:"var(--down)"},
+  {id:"handling",       key:"2", name:"держит корм, голова вверх", color:"var(--hand)"},
+  {id:"head_up_ahead",  key:"3", name:"осмотр · голова по телу", color:"var(--up3)"},
+  {id:"head_up_turnL",  key:"4", name:"осмотр · поворот влево",  color:"var(--up)"},
+  {id:"head_up_turnR",  key:"5", name:"осмотр · поворот вправо", color:"var(--up2)"},
+  {id:"transit",        key:"6", name:"взлёт / посадка",         color:"var(--other)"},
+  {id:"no_bird",        key:"7", name:"птицы нет",               color:"var(--nobird)"},
+  {id:"ambiguous",      key:"8", name:"непонятно",               color:"var(--amb)"},
+];
+// Старые метки прошлой разметки: показываются, но требуют пересмотра.
+const LEGACY_UP = "head_up";
+const LEGACY = new Set(["head_up","head_up_left","head_up_right","head_up_bino",
+                        "head_up_away","other"]);
+const byKey = Object.fromEntries(CLASSES.map(c=>[c.key,c.id]));
+const byId  = Object.fromEntries(CLASSES.map(c=>[c.id,c]));
+
+let files = [];        // {name, file, url}
+let labels = {};       // name -> class id
+// Фиксация — ВТОРОЕ независимое измерение, а не ещё один класс. Птица может
+// смотреть на наблюдателя, не поворачивая головы: подвижность глаза у воробьиных
+// 22-36 градусов. Поэтому поза и направление взгляда пишутся раздельно.
+let fix = {};          // name -> "yes" | "no" | "unk"
+// Сторона головы, обращённая к КАМЕРЕ. Это третье измерение и оно не про птицу,
+// а про геометрию съёмки: задаётся веткой и стороной подлёта. Именно поэтому
+// его нельзя смешивать с поворотом головы ОТ ТЕЛА (классы 4/5) — то выбор птицы,
+// а это выбор ветки. Разделив их, можно наконец спросить, связаны ли они.
+let side = {};         // name -> "L" | "R" | "F" | "A"
+let mark = {};         // name -> true, если помечен «проверить»
+// Число птиц в кадре — ЧЕТВЁРТОЕ измерение. Оно про сцену, а не про фокальную птицу:
+// фокальная разметка отвечает «что делает моя птица», счётчик — «в какой компании».
+// Именно эта пара и есть правильный дизайн для вопроса о размере группы: один вид,
+// одна кормушка, одна точка съёмки, разное число соседей.
+let cnt = {};          // name -> 0..9 (число птиц в кадре, включая фокальную)
+let mode = 1;          // 1 — классы, 2 — взгляд и сторона, 3 — число особей
+const MODES = {1:"классы (цифры 1-8)", 2:"взгляд и сторона", 3:"число особей (цифры 0-9)"};
+const SIDE = {L:{name:"левым боком к камере", key:"Q"},
+              R:{name:"правым боком к камере", key:"W"},
+              F:{name:"анфас, оба глаза", key:"E"},
+              A:{name:"затылком к камере", key:"R"}};
+// Старые метки прошлой разметки «сторона» переносятся сюда, а не в классы.
+const STORONA = {head_up_left:"L", head_up_right:"R",
+                 head_up_bino:"F", head_up_away:"A"};
+const FIX = {yes:{name:"смотрит на наблюдателя", color:"#e0b341"},
+             no: {name:"не смотрит",             color:"#4a5160"},
+             unk:{name:"глаз не разглядеть",     color:"#2b313f"}};
+let i = 0;
+let url = null;
+
+const $ = s => document.querySelector(s);
+
+// имя кадра: <клип>_t<время в десятых долях секунды>
+function parse(name){
+  const m = name.replace(/\.[^.]+$/,"").match(/^(.+)_t(\d+)$/);
+  return m ? {clip:m[1], t:parseInt(m[2],10)/10} : {clip:"?", t:0};
+}
+
+$("#pick").onchange = e => {
+  const list = [...e.target.files].filter(f=>/\.(jpe?g|png)$/i.test(f.name));
+  list.sort((a,b)=>{
+    const pa=parse(a.name), pb=parse(b.name);
+    return pa.clip===pb.clip ? pa.t-pb.t : pa.clip.localeCompare(pb.clip);
+  });
+  files = list.map(f=>({name:f.name.replace(/\.[^.]+$/,""), file:f}));
+  i = 0; show(); renderClips();
+};
+
+$("#pickcsv").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let n = 0, ns = 0, nf = 0;
+    const lines = r.result.split(/\r?\n/);
+    const head = (lines[0]||"").toLowerCase().split(",").map(x=>x.trim());
+    const cSide = head.indexOf("side"), cFix = head.indexOf("fixation");
+    const cCnt = head.indexOf("count"), cNote = head.indexOf("note");
+    lines.slice(1).forEach(line=>{
+      if(!line.trim()) return;
+      const p = line.split(",");
+      const name = p[0].trim(), lab = (p[1]||"").trim();
+      // labels_storona.csv: старая разметка стороны попадает в side, а не в класс
+      if(STORONA[lab]){ side[name] = STORONA[lab]; ns++; }
+      else if(byId[lab] || LEGACY.has(lab)){ labels[name] = lab; n++; }
+      const sv = cSide>=0 ? (p[cSide]||"").trim() : "";
+      if(SIDE[sv]){ side[name] = sv; ns++; }
+      const fv = cFix>=0 ? (p[cFix]||"").trim() : (cSide<0 ? (p[2]||"").trim() : "");
+      if(fv==="yes"||fv==="no"||fv==="unk"){ fix[name] = fv; nf++; }
+      const cv = cCnt>=0 ? (p[cCnt]||"").trim() : "";
+      if(/^[0-9]$/.test(cv)) cnt[name] = +cv;
+      const nv = cNote>=0 ? (p[cNote]||"").trim() : "";
+      if(nv==="проверить") mark[name] = true;
+    });
+    alert(`Загружено: классов ${n}, стороны ${ns}, взгляда ${nf}`);
+    show();
+  };
+  r.readAsText(f, "utf-8");
+};
+
+function show(){
+  if(!files.length) return;
+  i = Math.max(0, Math.min(i, files.length-1));
+  const f = files[i];
+  if(url) URL.revokeObjectURL(url);
+  url = URL.createObjectURL(f.file);
+  $("#stage").innerHTML = `<img src="${url}" alt="">`;
+  const p = parse(f.name);
+  $("#pos").textContent = `${i+1} / ${files.length}`;
+  $("#fname").textContent = `${p.clip} · ${p.t.toFixed(1)} с`;
+  const lab = labels[f.name];
+  $("#cur").innerHTML = LEGACY.has(lab)
+    ? `<span class="badge" style="background:var(--legacy)">старая метка: ${lab}</span>`
+    : lab
+      ? `<span class="badge" style="background:${byId[lab].color}">${byId[lab].name}</span>`
+      : `<span style="color:var(--muted)">не размечен</span>`;
+  $("#mode").innerHTML = `<span class="badge" style="background:#6a5acd">режим ${mode}: ${MODES[mode]}</span>`;
+  const cn = cnt[f.name];
+  $("#cnt").innerHTML = cn === undefined
+    ? `<span style="color:var(--muted)">птиц не сосчитано</span>`
+    : `<span class="badge" style="background:#2f8f6b">птиц в кадре: ${cn}</span>`;
+  const sd = side[f.name];
+  $("#side").innerHTML = sd
+    ? `<span class="badge" style="background:#3b6ea5">сторона: ${SIDE[sd].name}</span>`
+    : `<span style="color:var(--muted)">сторона не отмечена</span>`;
+  $("#mark").innerHTML = mark[f.name]
+    ? `<span class="badge" style="background:#a53b3b">ПРОВЕРИТЬ</span>` : "";
+  const fx = fix[f.name];
+  $("#fix").innerHTML = fx
+    ? `<span class="badge" style="background:${FIX[fx].color};color:#0b0d11">взгляд: ${FIX[fx].name}</span>`
+    : `<span style="color:var(--muted)">взгляд не отмечен</span>`;
+  renderKeys(lab); renderStats(); renderBar();
+}
+
+function renderKeys(cur){
+  $("#keys").innerHTML = CLASSES.map(c=>{
+    const n = Object.values(labels).filter(v=>v===c.id).length;
+    return `<div class="k ${cur===c.id?"cur":""}" data-id="${c.id}">
+      <span class="key">${c.key}</span>
+      <span class="sw" style="background:${c.color}"></span>
+      <span>${c.name}</span><span class="cnt">${n}</span></div>`;
+  }).join("");
+  const nLeg = Object.values(labels).filter(v=>LEGACY.has(v)).length;
+  if(nLeg){
+    $("#keys").insertAdjacentHTML("beforeend",
+      `<div class="k" id="jumpleg"><span class="key">U</span>
+       <span class="sw" style="background:var(--legacy)"></span>
+       <span>старые метки</span><span class="cnt">${nLeg}</span></div>`);
+    $("#jumpleg").onclick = jumpLegacy;
+  }
+  $("#keys").querySelectorAll(".k[data-id]").forEach(el=>{
+    el.onclick = () => setLabel(el.dataset.id, false);
+  });
+}
+
+function renderStats(){
+  const done = files.filter(f=>labels[f.name]).length;
+  const work = files.filter(f=>/^(head_down|handling|head_up_)/.test(labels[f.name]||"")).length;
+  const leg = files.filter(f=>LEGACY.has(labels[f.name])).length;
+  const fy = Object.values(fix).filter(v=>v==="yes").length;
+  const fn = Object.values(fix).filter(v=>v==="no").length;
+  const fu = Object.values(fix).filter(v=>v==="unk").length;
+  $("#stats").innerHTML =
+    `<div>размечено: <b>${done}</b> из ${files.length}</div>
+     <div style="color:var(--muted)">в рабочих классах: ${work}</div>
+     ${leg?`<div style="color:var(--legacy)">старых меток: ${leg}</div>`:""}
+     <div style="color:var(--muted);margin-top:6px">взгляд: ${fy} на наблюдателя,
+       ${fn} мимо, ${fu} не видно</div>`;
+}
+
+function renderBar(){
+  const w = 100/files.length;
+  $("#bar").innerHTML = files.map(f=>{
+    const l = labels[f.name];
+    const c = LEGACY.has(l) ? "var(--legacy)" : (l?byId[l].color:"#000");
+    return `<div style="width:${w}%;background:${c}"></div>`;
+  }).join("");
+}
+
+function renderClips(){
+  const m = {};
+  files.forEach(f=>{ const c = parse(f.name).clip; m[c] = (m[c]||0)+1; });
+  $("#clips").innerHTML = Object.entries(m).map(([c,n])=>{
+    const idx = files.findIndex(f=>parse(f.name).clip===c);
+    return `<div class="k" data-i="${idx}"><span>${c}</span><span class="cnt">${n}</span></div>`;
+  }).join("");
+  $("#clips").querySelectorAll(".k").forEach(el=>{
+    el.onclick = () => { i = +el.dataset.i; show(); };
+  });
+}
+
+function isUp(name){ return /^head_up/.test(labels[name]||""); }
+// в каком режиме какие кадры вообще интересны
+function relevant(name){
+  if(mode===2) return isUp(name);                       // взгляд — только осмотр
+  if(mode===3) return (labels[name]||"") !== "";        // счёт — все размеченные
+  return true;
+}
+// шаг вперёд/назад с учётом режима второго прохода
+function step(d){
+  let j = i + d;
+  if(mode!==1){
+    while(j>=0 && j<files.length && !relevant(files[j].name)) j += d;
+    if(j<0 || j>=files.length) return;
+  }
+  i = j; show();
+}
+function nextMode(){
+  mode = mode % 3 + 1;
+  if(mode!==1 && !relevant(files[i].name)){
+    const k = files.findIndex(f=>relevant(f.name));
+    if(k>=0) i = k;
+  }
+  show();
+}
+
+function jumpLegacy(){
+  const k = files.findIndex((f,idx)=>idx>i && LEGACY.has(labels[f.name]));
+  const j = k>=0 ? k : files.findIndex(f=>LEGACY.has(labels[f.name]));
+  if(j>=0){ i=j; show(); }
+}
+
+function setLabel(id, fill){
+  if(!files.length) return;
+  labels[files[i].name] = id;
+  if(fill){
+    // протянуть вперёд до следующего уже размеченного кадра того же клипа
+    const clip = parse(files[i].name).clip;
+    let j = i+1;
+    while(j < files.length && parse(files[j].name).clip === clip && !labels[files[j].name]){
+      labels[files[j].name] = id; j++;
+    }
+    i = Math.min(j, files.length-1);
+  } else if(i < files.length-1){
+    i++;
+  }
+  show();
+}
+
+addEventListener("keydown", e=>{
+  if(!files.length) return;
+  const n = files[i].name;
+  // цифры: в режиме 1 это классы, в режиме 3 — число птиц в кадре
+  if(mode===3 && /^[0-9]$/.test(e.key)){
+    cnt[n] = +e.key;
+    if(e.shiftKey){                     // протянуть счёт вперёд по тому же клипу
+      const clip = parse(n).clip; let j = i+1;
+      while(j<files.length && parse(files[j].name).clip===clip && cnt[files[j].name]===undefined){
+        cnt[files[j].name] = +e.key; j++;
+      }
+      i = Math.min(j, files.length-1); show();
+    } else step(+1);
+    e.preventDefault(); return;
+  }
+  if(mode!==3 && byKey[e.key]){ setLabel(byKey[e.key], e.shiftKey); e.preventDefault(); return; }
+  if(e.key==="ArrowRight"){ step(+1); e.preventDefault(); return; }
+  if(e.key==="ArrowLeft"){ step(-1); e.preventDefault(); return; }
+  if(e.key==="Backspace"){ delete labels[n]; show(); e.preventDefault(); return; }
+  if(e.key==="u"||e.key==="U"||e.key==="г"||e.key==="Г"){ jumpLegacy(); e.preventDefault(); return; }
+  if(e.key==="Tab"){ nextMode(); e.preventDefault(); return; }
+  // взгляд на наблюдателя
+  if(e.code==="KeyF"||e.code==="KeyD"||e.code==="KeyS"){
+    fix[n] = e.code==="KeyF" ? "yes" : e.code==="KeyD" ? "no" : "unk";
+    if(mode===2) step(+1); else show();
+    e.preventDefault(); return;
+  }
+  if(e.code==="KeyX"){ delete fix[n]; show(); e.preventDefault(); return; }
+  if(e.code==="KeyB"){ delete cnt[n]; show(); e.preventDefault(); return; }
+  // сторона головы, обращённая к камере
+  if(e.code==="KeyQ"||e.code==="KeyW"||e.code==="KeyE"||e.code==="KeyR"){
+    side[n] = {KeyQ:"L", KeyW:"R", KeyE:"F", KeyR:"A"}[e.code];
+    show(); e.preventDefault(); return;
+  }
+  if(e.code==="KeyZ"){ delete side[n]; show(); e.preventDefault(); return; }
+  // пометка «сюда стоит вернуться и проверить»
+  if(e.code==="KeyC"){
+    if(mark[n]) delete mark[n]; else mark[n] = true;
+    show(); e.preventDefault(); return;
+  }
+  if(e.key==="Home"){
+    const k = files.findIndex(f=>!labels[f.name]);
+    if(k>=0){ i=k; show(); } e.preventDefault();
+  }
+});
+
+function download(name, text){
+  const b = new Blob([text], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(b); a.download = name; a.click();
+}
+
+$("#expLab").onclick = () => {
+  const rows = ["file,label,side,fixation,count,note"];
+  files.forEach(f=>{
+    const n = f.name;
+    if(labels[n] || fix[n] || side[n] || mark[n] || cnt[n]!==undefined)
+      rows.push(`${n},${labels[n]||""},${side[n]||""},${fix[n]||""},`
+              + `${cnt[n]===undefined?"":cnt[n]},${mark[n]?"проверить":""}`);
+  });
+  download("labels_mine.csv", rows.join("\n"));
+};
+
+// интервалы: склеиваем подряд идущие одинаковые метки внутри клипа
+renderKeys(null);   // показать классы сразу, до загрузки папки
+
+$("#expInt").onclick = () => {
+  const rows = ["clip,start_s,end_s,label,note"];
+  let run = null;
+  const flush = () => {
+    if(run) rows.push(`${run.clip},${run.s.toFixed(2)},${run.e.toFixed(2)},${run.lab},`);
+    run = null;
+  };
+  const merge = l => /^head_up_/.test(l||"") ? "head_up" : l;   // повороты головы → один осмотр
+  files.forEach(f=>{
+    const lab = merge(labels[f.name]); const p = parse(f.name);
+    if(!lab){ flush(); return; }
+    if(run && run.clip===p.clip && run.lab===lab){ run.e = p.t + run.step; return; }
+    flush();
+    run = {clip:p.clip, lab:lab, s:p.t, e:p.t+0.5, step:0.5};
+  });
+  flush();
+  download("intervals_mine.csv", rows.join("\n"));
+};
+</script>

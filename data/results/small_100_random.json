@@ -1,0 +1,34 @@
+{
+ "accuracy": 0.8333333333333334,
+ "macro_f1": 0.8274974551786434,
+ "weighted_f1": 0.8312329928114388,
+ "labels": [
+  "alert",
+  "empty",
+  "feeding"
+ ],
+ "confusion": [
+  [
+   89,
+   5,
+   10
+  ],
+  [
+   0,
+   42,
+   2
+  ],
+  [
+   14,
+   3,
+   39
+  ]
+ ],
+ "experiment": "small",
+ "note": "часть обучающей выборки против всей: размер против точности",
+ "fliplr": 0.0,
+ "baseline_class": "alert",
+ "baseline_accuracy": 0.5098039215686274,
+ "strongest_constant_class": "alert",
+ "strongest_constant_accuracy": 0.5098039215686274
+}
