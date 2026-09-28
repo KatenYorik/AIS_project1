@@ -10,8 +10,8 @@
 
 | что | где |
 |---|---|
-| Отчёт Проекта 1 | [`project1/ОТЧЁТ_ПРОЕКТ1.ru.md`](ОТЧЁТ_ПРОЕКТ1.ru.md) |
-| ClearML, проект `AIS-birds` | `https://app.clear.ml/projects/c2fb292e6f5d4d98a248152756f16684/experiments/87432635605b4483a312f63b277e30e1/output/execution` |
+| Отчёт Проекта 1 | [`ОТЧЁТ_ПРОЕКТ1.ru.md`](ОТЧЁТ_ПРОЕКТ1.ru.md) |
+| ClearML, проект | [`AIS-birds`](https://app.clear.ml/projects/c2fb292e6f5d4d98a248152756f16684/experiments/87432635605b4483a312f63b277e30e1/output/execution) |
 | Итоговая модель ONNX | [`data/runs/classify/pretrain_stage2/weights/best.onnx`](../data/runs/classify/pretrain_stage2/weights/best.onnx) |
 
 ## Главное
