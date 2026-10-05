@@ -15,12 +15,12 @@
 |---|---|---|---|
 | 1 | [`step1_task`](step1_task/README.md) | классификация кадра: кормление / осмотр / птицы нет | готово |
 | 2 | [`step2_dataset`](step2_dataset/README.md) | своя съёмка 946 кадров + открытый Visual WetlandBirds 1947 вырезок, деление по клипам | готово |
-| 3 | [`step3_annotation_versioning`](step3_annotation_versioning/README.md) | разметка в своём инструменте в три прохода; экспорт для CVAT; версии v1/v2 в ClearML | разметка готова; **в CVAT не загружено** |
+| 3 | [`step3_annotation_versioning`](step3_annotation_versioning/README.md) | разметка в своём инструменте в три прохода; экспорт для CVAT; версии v1/v2 в ClearML | разметка готова; загружена в Roboflow |
 | 4 | [`step4_baseline_model`](step4_baseline_model/README.md) | `yolo11n-cls`, 30 эпох на CPU, журнал в ClearML | готово |
 | 5 | [`step5_metrics`](step5_metrics/README.md) | accuracy + macro-F1 против константы, матрица ошибок, разбор по клипам | готово |
 | 6 | [`step6_experiments`](step6_experiments/README.md) | 3 обязательных эксперимента + 7 дополнительных запусков, итоговая модель | готово |
 | 7 | [`step7_training_resources`](step7_training_resources/README.md) | всё на процессоре AMD Ryzen 5 5500U | готово |
-| 8 | [`step8_deployment_demo`](step8_deployment_demo/README.md) | экспорт в ONNX; живая демонстрация с камеры | экспорт готов; **демонстрация не записана** |
+| 8 | [`step8_deployment_demo`](step8_deployment_demo/README.md) | экспорт в ONNX; живая демонстрация с камеры | экспорт готов; демонстрация готова |
 
 ## Главное в числах
 
